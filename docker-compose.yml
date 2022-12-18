@@ -1,0 +1,30 @@
+version: '3'
+services:
+  php:
+    build:
+      context: ./docker/php
+    volumes:
+      - './src:/var/www/html'
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    links:
+      - mysql:mysql
+    volumes:
+      - './src:/var/www/html'
+      - './docker/nginx/conf.d:/etc/nginx/conf.d'
+
+  mysql:
+    image: mysql:8
+    command: --init-file /data/application/init.sql
+    volumes:
+      - ./database/create-database.sql:/data/application/init.sql
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_USER=todobot
+      - MYSQL_PASSWORD=todobot
+      - MYSQL_DATABASE=todobot
